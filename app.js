@@ -1,16 +1,31 @@
-const http = require("node:http");
-const fs = require("node:fs");
+const EventEmitter = require("./events");
 
-const server = http.createServer();
+class Emitter extends EventEmitter {}
 
-server.on("request", (request, response) => {
-  const result = fs.readFileSync("./text.txt");
+const myE = new Emitter();
 
-  response.setHeader("Content-Type", "text/plain");
-
-  response.end(result);
+//.on() is for register listeners
+myE.on("foo", () => {
+  console.log("An event occurred 2.");
 });
 
-server.listen(4080, "127.0.0.1", () => {
-  console.log("Server has started on:", server.address());
+myE.on("foo", () => {
+  console.log("An event occurred 1.");
 });
+
+myE.on("foo", (x) => {
+  console.log("An event with a parameter occured:");
+  console.log(x);
+});
+
+//once() is for register listeners that will be called only once
+myE.once("bar", () => {
+  console.log("An event occured bar.");
+});
+
+//.emit() is for emitting/trigger events
+myE.emit("foo");
+myE.emit("foo", "some text");
+
+myE.emit("bar");
+myE.emit("bar");
